@@ -63,7 +63,8 @@ RBT_Node* treeSearch(RBT_Node *x,int km);
 void inorder_tree_walk(RBT_Node* root);
 
 //Double-Linked List
-void inserisciTappa(Tappa_Percorso** inizio, RBT_Node* nodo);
+Tappa_Percorso* inserisciTappa(Tappa_Percorso** inizio, RBT_Node* nodo);
+void rimuoviUltimaTappa(Tappa_Percorso** inizio);
 void cancellaPercorso(Tappa_Percorso** inizio);
 void stampaPercorso(Tappa_Percorso *inizio);
 
@@ -643,14 +644,14 @@ void distruggiStazione(RBT_Node *node){
     free(node);
 }
 
-void inserisciTappa(Tappa_Percorso** inizio, RBT_Node* nodo){
+Tappa_Percorso* inserisciTappa(Tappa_Percorso** inizio, RBT_Node* nodo){
     
-    if(inizio == NULL){
+    if(*inizio == NULL){
         *inizio = (Tappa_Percorso*)malloc(sizeof(Tappa_Percorso));
         (*inizio)->next = NULL;
         (*inizio)->prec = NULL;
         (*inizio)->node = nodo;
-        return;
+        return *inizio;
     }
     Tappa_Percorso *temp = *inizio;
     while(temp->next != NULL){
@@ -661,7 +662,7 @@ void inserisciTappa(Tappa_Percorso** inizio, RBT_Node* nodo){
     temp->next->next = NULL;
     temp->next->prec = temp;
     temp->next->node = nodo;
-    return;
+    return temp->next;
 }
 
 void cancellaPercorso(Tappa_Percorso** inizio){
@@ -705,8 +706,73 @@ int pianificaPercorso(RBT_Node *root, int kmInizio, int kmFine){
 
 int pianificaPercorsoForward(RBT_Node *root, int kmInizio, int kmFine){
     
+    char end = 0;
+    RBT_Node *nodoInizio = treeSearch(root, kmInizio);
+    RBT_Node *nodoFine = treeSearch(root, kmFine);
+    int limite = nodoInizio->station.km + autonomiaStazione(nodoInizio);
+    
+    int currMax = kmInizio;
+    RBT_Node *currMaxNode = NULL;
+    
+    RBT_Node *currNode = treeSuccessor(nodoInizio);
+    
+    inserisciTappa(&PERCORSO, nodoInizio);
+    
+    while(end == 0 && currNode != T_Nil){
+        while(currNode != T_Nil && currNode->station.km <= limite){
+            //Se arriva più lontano cambio stazione per la tappa
+            
+            int maxDist = currNode->station.km + autonomiaStazione(currNode);
+            
+            if(maxDist > currMax || currMaxNode == NULL || (maxDist == currMax && currNode->station.km < currMaxNode->station.km)){
+                currMax = maxDist;
+                currMaxNode = currNode;
+                
+                if(currMax > kmFine){
+                    end = 1;
+                    break;
+                }
+            }
+            
+            currNode = treeSuccessor(currNode);
+        }
+        
+        if(currNode == T_Nil) return -1;
+        
+        inserisciTappa(&PERCORSO, currMaxNode);
+        currMax = currMaxNode->station.km;
+        currNode = treeSuccessor(currMaxNode);
+        limite = currMaxNode->station.km + autonomiaStazione(currMaxNode);
+        currMaxNode = NULL;
+    }
+    
+    if(end == 0) return -1;
+    
+    inserisciTappa(&PERCORSO, nodoFine);
+    
+    
+    
     return 1;
 }
+
+void rimuoviUltimaTappa(Tappa_Percorso** inizio){
+    Tappa_Percorso *point = *inizio;
+    if(point == NULL) return;
+    if(point->next == NULL){
+        free(point);
+        *inizio = NULL;
+        return;
+    }
+    
+    while(point->next->next != NULL){
+        point = point->next;
+    }
+    
+    free(point->next);
+    point->next = NULL;
+    
+}
+
 
 int pianificaPercorsoReverse(RBT_Node *root, int kmInizio, int kmFine){
     
