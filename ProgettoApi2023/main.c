@@ -58,6 +58,7 @@ int autonomiaStazione(RBT_Node *node);
 int aggiungiAuto(RBT_Node *node, int km);
 int rimuoviAuto(RBT_Node *node, int km);
 void stampaAuto(RBT_Node* node);
+void distruggiStazione(RBT_Node *node);
 
 int main(int argc, const char * argv[]) {
     
@@ -94,7 +95,61 @@ int main(int argc, const char * argv[]) {
                 aggiungiAuto(nuovoNodo, kmAuto);
             }
             printf("aggiunta\n");
-            inorder_tree_walk(ROOT);
+            continue;
+        }
+        else if(strcmp(token, "demolisci-stazione") == 0){
+            token = strsep(&strp, delimiter);
+            int kmStazione = atoi(token);
+            
+            if(delete(&ROOT, treeSearch(ROOT, kmStazione)) > 0){
+                printf("demolita\n");
+                continue;
+            }
+            else{
+                printf("non demolita\n");
+                continue;
+            }
+           
+        }
+        else if(strcmp(token, "aggiungi-auto") == 0){
+            token = strsep(&strp, delimiter);
+            int kmStazione = atoi(token);
+            
+            RBT_Node *stazione = treeSearch(ROOT, kmStazione);
+            if(stazione == T_Nil){
+                printf("non aggiunta\n");
+                continue;
+            }
+            
+            token = strsep(&strp, delimiter);
+            int kmAuto = atoi(token);
+            aggiungiAuto(stazione, kmAuto);
+            printf("aggiunta\n");
+            continue;
+            
+        }
+        else if(strcmp(token, "rottama-auto") == 0){
+            token = strsep(&strp, delimiter);
+            int kmStazione = atoi(token);
+            
+            RBT_Node *stazione = treeSearch(ROOT, kmStazione);
+            if(stazione == T_Nil){
+                printf("non rottamata\n");
+                continue;
+            }
+            
+            token = strsep(&strp, delimiter);
+            int kmAuto = atoi(token);
+            if(rimuoviAuto(stazione, kmAuto) > 0){
+                printf("rottamata\n");
+                continue;
+            }
+            else{
+                printf("non rottamata\n");
+                continue;
+            }
+        }
+        else{
             
         }
                 
@@ -313,6 +368,7 @@ int delete(RBT_Node** root, RBT_Node* z){
     if(y_original_color == BLACK){
         deleteFixup(root, x);
     }
+    distruggiStazione(z);
     return 1;
     
 }
@@ -467,7 +523,6 @@ int aggiungiAuto(RBT_Node *node, int km){
     
     Car* temp = node->station.cars;
     
-    if(temp->km == km) return -1;
     if(temp->km < km){
         Car* temp2 = (Car*)malloc(sizeof(Car));
         temp2->km = km;
@@ -480,7 +535,6 @@ int aggiungiAuto(RBT_Node *node, int km){
         temp = temp->next;
     }
     
-    if(temp->km == km) return -1;
     if(temp->next == NULL && temp->km > km){
         temp->next = (Car*)malloc(sizeof(Car));
         temp->next->km = km;
@@ -540,4 +594,18 @@ void stampaAuto(RBT_Node* node){
         c = c->next;
     }
     printf("\n");
+}
+
+void distruggiStazione(RBT_Node *node){
+    
+    Car* car = node->station.cars;
+    
+    
+    while(car != NULL){
+        Car* temp = car->next;
+        free(car);
+        car = temp;
+    }
+    
+    free(node);
 }
