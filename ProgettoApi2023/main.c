@@ -30,12 +30,21 @@ typedef struct Node{
     struct Node *parent;
 } RBT_Node;
 
+typedef struct Tappa{
+    struct Tappa *next;
+    struct Tappa *prec;
+    RBT_Node* node;
+} Tappa_Percorso;
+
 //LEAF OF RBT
 RBT_Node T_Nil_Node;
 RBT_Node* T_Nil = &T_Nil_Node;
 
 //RBT ROOT
 RBT_Node* ROOT = NULL;
+
+//PERCORSO
+Tappa_Percorso* PERCORSO = NULL;
 
 //RBT FUNCTIONS
 RBT_Node* newNode(int km);
@@ -53,12 +62,20 @@ RBT_Node* treePredecessor(RBT_Node *x);
 RBT_Node* treeSearch(RBT_Node *x,int km);
 void inorder_tree_walk(RBT_Node* root);
 
-//Cars Functions
+//Double-Linked List
+void inserisciTappa(Tappa_Percorso** inizio, RBT_Node* nodo);
+void cancellaPercorso(Tappa_Percorso** inizio);
+void stampaPercorso(Tappa_Percorso *inizio);
+
+//Project Functions
 int autonomiaStazione(RBT_Node *node);
 int aggiungiAuto(RBT_Node *node, int km);
 int rimuoviAuto(RBT_Node *node, int km);
 void stampaAuto(RBT_Node* node);
 void distruggiStazione(RBT_Node *node);
+int pianificaPercorso(RBT_Node *root, int kmInizio, int kmFine);
+int pianificaPercorsoForward(RBT_Node *root, int kmInizio, int kmFine);
+int pianificaPercorsoReverse(RBT_Node *root, int kmInizio, int kmFine);
 
 int main(int argc, const char * argv[]) {
     
@@ -150,6 +167,22 @@ int main(int argc, const char * argv[]) {
             }
         }
         else{
+            //LESSSSS DOIT
+            token = strsep(&strp, delimiter);
+            int kmStazioneInizio = atoi(token);
+            
+            token = strsep(&strp, delimiter);
+            int kmStazioneFine = atoi(token);
+            
+            if(pianificaPercorso(ROOT, kmStazioneInizio, kmStazioneFine) > 0){
+                stampaPercorso(PERCORSO);
+                cancellaPercorso(&PERCORSO);
+                continue;
+            }
+            else{
+                printf("nessun percorso\n");
+                continue;
+            }
             
         }
                 
@@ -608,4 +641,74 @@ void distruggiStazione(RBT_Node *node){
     }
     
     free(node);
+}
+
+void inserisciTappa(Tappa_Percorso** inizio, RBT_Node* nodo){
+    
+    if(inizio == NULL){
+        *inizio = (Tappa_Percorso*)malloc(sizeof(Tappa_Percorso));
+        (*inizio)->next = NULL;
+        (*inizio)->prec = NULL;
+        (*inizio)->node = nodo;
+        return;
+    }
+    Tappa_Percorso *temp = *inizio;
+    while(temp->next != NULL){
+        temp = temp->next;
+    }
+    
+    temp->next = (Tappa_Percorso*)malloc(sizeof(Tappa_Percorso));
+    temp->next->next = NULL;
+    temp->next->prec = temp;
+    temp->next->node = nodo;
+    return;
+}
+
+void cancellaPercorso(Tappa_Percorso** inizio){
+    Tappa_Percorso* tappa = *inizio;
+    
+    while(tappa != NULL){
+        Tappa_Percorso* temp = tappa->next;
+        free(tappa);
+        tappa = temp;
+    }
+    
+    inizio = NULL;
+}
+
+void stampaPercorso(Tappa_Percorso *inizio){
+    Tappa_Percorso* tappa = inizio;
+    char f = 1;
+    while(tappa != NULL){
+        
+        printf("%d", tappa->node->station.km);
+        if(tappa->next != NULL) printf(" ");
+        
+        tappa = tappa->next;
+    }
+    printf("\n");
+}
+
+int pianificaPercorso(RBT_Node *root, int kmInizio, int kmFine){
+    
+    if(kmInizio == kmFine){
+        inserisciTappa(&PERCORSO, treeSearch(ROOT, kmInizio));
+        return 1;
+    }
+    else if(kmInizio < kmFine){
+        return pianificaPercorsoForward(root, kmInizio, kmFine);
+    }
+    else{
+        return pianificaPercorsoReverse(root, kmInizio, kmFine);
+    }
+}
+
+int pianificaPercorsoForward(RBT_Node *root, int kmInizio, int kmFine){
+    
+    return 1;
+}
+
+int pianificaPercorsoReverse(RBT_Node *root, int kmInizio, int kmFine){
+    
+    return 1;
 }
