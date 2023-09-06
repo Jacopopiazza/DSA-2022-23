@@ -238,6 +238,7 @@
 		32126F342AA885710077AFBC /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 22WZG4QASY;
 				ENABLE_HARDENED_RUNTIME = YES;
