@@ -175,13 +175,21 @@ int main(int argc, const char * argv[]) {
             token = strsep(&strp, delimiter);
             int kmStazioneFine = atoi(token);
             
-            if(pianificaPercorso(ROOT, kmStazioneInizio, kmStazioneFine) > 0){
+            int ris = pianificaPercorso(ROOT, kmStazioneInizio, kmStazioneFine);
+            
+            if(ris > 0){
                 stampaPercorso(PERCORSO);
                 cancellaPercorso(&PERCORSO);
                 continue;
             }
-            else{
+            else if(ris < 0){
+                cancellaPercorso(&PERCORSO);
                 printf("nessun percorso\n");
+                continue;
+            }
+            else{
+                printf("%d-%d NOT IMPLEMENTED YET\n", kmStazioneInizio,kmStazioneFine);
+                cancellaPercorso(&PERCORSO);
                 continue;
             }
             
@@ -674,12 +682,11 @@ void cancellaPercorso(Tappa_Percorso** inizio){
         tappa = temp;
     }
     
-    inizio = NULL;
+    *inizio = NULL;
 }
 
 void stampaPercorso(Tappa_Percorso *inizio){
     Tappa_Percorso* tappa = inizio;
-    char f = 1;
     while(tappa != NULL){
         
         printf("%d", tappa->node->station.km);
@@ -711,24 +718,37 @@ int pianificaPercorsoForward(RBT_Node *root, int kmInizio, int kmFine){
     RBT_Node *nodoFine = treeSearch(root, kmFine);
     int limite = nodoInizio->station.km + autonomiaStazione(nodoInizio);
     
+    //Dalla prima stazione arrivo direttamente a destinazione
+    if(limite >= kmFine){
+        inserisciTappa(&PERCORSO, nodoInizio);
+        inserisciTappa(&PERCORSO, nodoFine);
+        return 1;
+    }
+    
+    //Preparo elementi
     int currMax = kmInizio;
     RBT_Node *currMaxNode = NULL;
-    
     RBT_Node *currNode = treeSuccessor(nodoInizio);
+    char foundNext = 0;
     
+    //Aggiungo stazione di inizio nel percorso
     inserisciTappa(&PERCORSO, nodoInizio);
     
+    //Cerco percorso con numero minimo di tappe
     while(end == 0 && currNode != T_Nil){
+        foundNext = 0;
         while(currNode != T_Nil && currNode->station.km <= limite){
             //Se arriva più lontano cambio stazione per la tappa
             
             int maxDist = currNode->station.km + autonomiaStazione(currNode);
             
             if(maxDist > currMax || currMaxNode == NULL || (maxDist == currMax && currNode->station.km < currMaxNode->station.km)){
+                foundNext = 1;
                 currMax = maxDist;
                 currMaxNode = currNode;
                 
-                if(currMax > kmFine){
+                //Perocrso trovato
+                if(currMax >= kmFine){
                     end = 1;
                     break;
                 }
@@ -737,8 +757,12 @@ int pianificaPercorsoForward(RBT_Node *root, int kmInizio, int kmFine){
             currNode = treeSuccessor(currNode);
         }
         
+        //Ho finito l'albero, il percorso non c'è...
         if(currNode == T_Nil) return -1;
+        //Tutte le stazioni raggiungibili sono troppo lontane dalle altre
+        if(foundNext==0 && currNode->station.km > limite) return -1;
         
+        //Tappa trovata, resetto puntatori
         inserisciTappa(&PERCORSO, currMaxNode);
         currMax = currMaxNode->station.km;
         currNode = treeSuccessor(currMaxNode);
@@ -746,10 +770,38 @@ int pianificaPercorsoForward(RBT_Node *root, int kmInizio, int kmFine){
         currMaxNode = NULL;
     }
     
+    //Nessuna altra stazione raggiungibile
     if(end == 0) return -1;
     
-    inserisciTappa(&PERCORSO, nodoFine);
+    Tappa_Percorso *last = inserisciTappa(&PERCORSO, nodoFine);
+    Tappa_Percorso *toBeOptimized = last->prec;
     
+    
+    //Fino alla seconda tappa
+    while(toBeOptimized != NULL && toBeOptimized->prec != NULL){
+        
+        int lowerBound = toBeOptimized->prec->node->station.km;
+        int upperBound = toBeOptimized->node->station.km;
+        
+        int kmToReach = last->node->station.km;
+        
+        RBT_Node* node = treeSearch(ROOT, toBeOptimized->prec->node->station.km);
+        node = treeSuccessor(node);
+        
+        while(node->station.km > lowerBound && node->station.km < upperBound){
+            //Ho trovato una stazione migliore
+            if(node->station.km + autonomiaStazione(node) >= kmToReach && node->station.km < toBeOptimized->node->station.km){
+                toBeOptimized->node = node;
+            }
+            //continuo a cercare
+            node = treeSuccessor(node);
+        }
+        
+        //Ottimizzo la tappa precedente
+        last = last->prec;
+        toBeOptimized = toBeOptimized->prec;
+        
+    }
     
     
     return 1;
@@ -776,5 +828,5 @@ void rimuoviUltimaTappa(Tappa_Percorso** inizio){
 
 int pianificaPercorsoReverse(RBT_Node *root, int kmInizio, int kmFine){
     
-    return 1;
+    return 0;
 }
