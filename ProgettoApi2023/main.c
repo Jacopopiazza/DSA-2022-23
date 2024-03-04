@@ -1,10 +1,3 @@
-//
-//  main.c
-//  ProgettoApi2023
-//
-//  Created by Japo on 06/09/23.
-//
-
 #include<stdio.h>
 #include<stdlib.h>
 #include <string.h>
