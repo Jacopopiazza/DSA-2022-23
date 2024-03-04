@@ -20,14 +20,18 @@ This repo contains a solution of the 2022/23 Polimi's Data Structures and Algori
 No official results can be given, as I could not take part in the actual exam. Nonetheless, my code runs in similar time and memory consumption to those that achieved honors grades.
 
 ## Goal
+
 The application domain is book recommendation. 
+
 The datasets we provide contains interactions of users with books, in particular, if the user attributed to the book a rating of at least 4.
+
 The main goal of the competition is to discover which items (books) a user will interact with.
 
 ## Data Structures Description
 
-The main data structure used to store the stations is a Red-Black Tree, implementing the CLRS Red-Black Trees pseudocode.<br>
-Cars parked in stations are stored in Linked Lists. This choice was initially made to keep the code simple and was never changed as the code proved to be fast enough. To achieve even better performance, cars may be stored using a priority queue structure, such as a MaxHeap.<br>
+The main data structure used to store the stations is a Red-Black Tree, implementing the CLRS Red-Black Trees pseudocode.
+
+Cars parked in stations are stored in Linked Lists. This choice was initially made to keep the code simple and was never changed as the code proved to be fast enough. To achieve even better performance, cars may be stored using a priority queue structure, such as a MaxHeap.
 
 ## Algorithm Description
 
