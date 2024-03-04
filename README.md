@@ -1,10 +1,7 @@
 # Data Structures and Algorithms 2022/23- Polimi
 
 <p align="center">
-  <img width="100%" src="https://i.imgur.com/tm9mSuM.png" alt="header" />
-</p>
-<p align="center">
-    <img src="https://i.imgur.com/mPb3Qbd.gif" width="180" alt="Politecnico di Milano"/>
+  <img width="100%" src="https://walkccc.me/CLRS/img/13.1-2-1.png" alt="header" />
 </p>
 
 This repo contains a solution of the 2022/23 Polimi's Data Structures and Algorithm final exam I wrote this summer to keep myself trained.
