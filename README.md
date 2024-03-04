@@ -22,8 +22,11 @@ The main goal of the competition is to discover which items (books) a user will 
 
 ## Data Structures Description
 
-The main data structure used to store the stations is a Red-Black Tree, implementing the CLRS Red-Black Trees pseudocode. Cars parked in stations are stored in Linked Lists. This choice was initially made to keep the code simple and was never changed as the code proved to be fast enough. To achieve even better performance, cars may be stored using a priority queue structure, such as a MaxHeap.
+The main data structure used to store the stations is a Red-Black Tree, implementing the CLRS Red-Black Trees pseudocode.<br>
+Cars parked in stations are stored in Linked Lists. This choice was initially made to keep the code simple and was never changed as the code proved to be fast enough. To achieve even better performance, cars may be stored using a priority queue structure, such as a MaxHeap.<br>
 
 ## Algorithm Description
 
-The calculation of the shortest path takes advantage of the order of the stations in the tree and visits each station at most twice. The first visit occurs during the forward pass to find the farthest station that can be reached (to determine if the given destination is reachable), and the second visit adjusts the path as per the requirements of the assignment. The lookup cost of the starting station, as well as the costs to find the previous or following nodes in the tree, have logarithmic costs. Thus, the overall temporal complexity is O(n * log n) and the space complexity is O(n), where n is the number of stored stations.
+The calculation of the shortest path takes advantage of the order of the stations in the tree and visits each station at most twice.<br>
+The first visit occurs during the forward pass to find the farthest station that can be reached (to determine if the given destination is reachable), and the second visit adjusts the path as per the requirements of the assignment.<br>
+The lookup cost of the starting station, as well as the costs to find the previous or following nodes in the tree, have logarithmic costs. Thus, the overall temporal complexity is O(n * log n) and the space complexity is O(n), where n is the number of stored stations.<br>
