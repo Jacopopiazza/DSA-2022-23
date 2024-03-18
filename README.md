@@ -31,3 +31,7 @@ The first visit occurs during the forward pass to find the farthest station that
 The lookup cost of the starting station, as well as the costs to find the previous or following nodes in the tree, have logarithmic costs.
 
 The overall temporal complexity is $O(n \log n)$ and the space complexity is $O(n)$, where $n$ is the number of stored stations.
+
+## A.Y. 2021-22 Solution
+
+[WordChecker](https://github.com/Jacopopiazza/WordChecker)
